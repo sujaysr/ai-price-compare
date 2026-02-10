@@ -63,10 +63,16 @@ function compare() {
   const stores = [...document.querySelectorAll("input[type=checkbox]:checked")]
                  .map(c => c.value);
 
-  if (!item || !pin || stores.length === 0) {
-    alert("Enter item, pin code & select store");
-    return;
-  }
+  fetch("https://YOUR_BACKEND_URL/compare", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ item, pincode: pin, stores })
+  })
+  .then(res => res.json())
+  .then(data => renderResults(data.results));
+}
+  
+ 
 
   let html = "<table><tr><th>Store</th><th>Price</th><th>ETA</th><th></th></tr>";
 
