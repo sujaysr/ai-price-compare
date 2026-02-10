@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Price Compare</title>
+
+<style>
+body { font-family: Arial; background:#f2f2f2; margin:0; padding-bottom:140px; }
+.header { background:#111; color:#fff; padding:12px; text-align:center; }
+.section { background:#fff; margin:10px; padding:12px; border-radius:10px; }
+button { padding:8px; margin-top:6px; width:100%; }
+table { width:100%; border-collapse:collapse; }
+td, th { padding:6px; border-bottom:1px solid #ddd; font-size:14px; }
+.cart-btn { background:#0d6efd; color:#fff; border:none; }
+.order-btn { background:#198754; color:#fff; border:none; }
+.small { font-size:12px; color:#555; }
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h3>AI Price Comparison</h3>
+</div>
+
+<div class="section">
+  <b>Select Stores</b><br>
+  <label><input type="checkbox" value="amazon"> Amazon</label><br>
+  <label><input type="checkbox" value="amazon_now"> Amazon Now</label><br>
+  <label><input type="checkbox" value="amazon_fresh"> Amazon Fresh</label><br>
+  <label><input type="checkbox" value="flipkart"> Flipkart</label><br>
+  <label><input type="checkbox" value="flipkart_minutes"> Flipkart Minutes</label>
+</div>
+
+<div class="section">
+  <input id="item" placeholder="Enter item name" style="width:100%;padding:8px"><br><br>
+  <input id="pin" placeholder="Delivery PIN code" style="width:100%;padding:8px"><br><br>
+  <button onclick="compare()">Compare Prices</button>
+</div>
+
+<div class="section">
+  <b>Comparison</b>
+  <div id="results"></div>
+</div>
+
+<div class="section">
+  <b>Temporary Carts</b>
+  <div id="carts"></div>
+</div>
+
+<script>
+const cart = {
+  amazon: [],
+  amazon_now: [],
+  amazon_fresh: [],
+  flipkart: [],
+  flipkart_minutes: []
+};
+
+function compare() {
+  const item = document.getElementById("item").value;
+  const pin = document.getElementById("pin").value;
+  const stores = [...document.querySelectorAll("input[type=checkbox]:checked")]
+                 .map(c => c.value);
+
+  if (!item || !pin || stores.length === 0) {
+    alert("Enter item, pin code & select store");
+    return;
+  }
+
+  let html = "<table><tr><th>Store</th><th>Price</th><th>ETA</th><th></th></tr>";
+
+  stores.forEach(s => {
+    const price = Math.floor(Math.random() * 100) + 80;
+    const eta = s.includes("minutes") ? "15 mins" : "Tomorrow";
+
+    html += `
+      <tr>
+        <td>${s.replace("_"," ").toUpperCase()}</td>
+        <td>₹${price}</td>
+        <td>${eta}</td>
+        <td>
+          <button class="cart-btn"
+            onclick="addToCart('${s}','${item}',${price})">
+            Add
+          </button>
+        </td>
+      </tr>`;
+  });
+
+  html += "</table><p class='small'>Prices indicative. Final checkout in app.</p>";
+  document.getElementById("results").innerHTML = html;
+}
+
+function addToCart(store, item, price) {
+  cart[store].push({ item, price });
+  renderCarts();
+}
+
+function renderCarts() {
+  let html = "";
+  for (let store in cart) {
+    if (cart[store].length > 0) {
+      html += `<b>${store.replace("_"," ").toUpperCase()}</b><ul>`;
+      cart[store].forEach(i => {
+        html += `<li>${i.item} – ₹${i.price}</li>`;
+      });
+      html += `</ul>
+        <button class="order-btn"
+          onclick="order('${store}')">Order Now</button><br><br>`;
+    }
+  }
+  document.getElementById("carts").innerHTML = html;
+}
+
+function order(store) {
+  let link = "";
+  let fallback = "";
+
+  if (store.includes("amazon")) {
+    link = "amazon://cart";
+    fallback = "https://www.amazon.in/gp/cart/view.html";
+  } else {
+    link = "flipkart://cart";
+    fallback = "https://www.flipkart.com/viewcart";
+  }
+
+  window.location.href = link;
+  setTimeout(() => window.location.href = fallback, 1200);
+}
+</script>
+
+</body>
+</html>
