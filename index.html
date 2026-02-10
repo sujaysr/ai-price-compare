@@ -72,7 +72,24 @@ function compare() {
   .then(data => renderResults(data.results));
 }
   
- 
+ function renderResults(results) {
+  let html = "<table><tr><th>Store</th><th>Price</th><th>ETA</th><th></th></tr>";
+  results.forEach(r => {
+    html += `
+      <tr>
+        <td>${r.store}</td>
+        <td>₹${r.price}</td>
+        <td>${r.delivery_eta}</td>
+        <td>
+          <button onclick="addToCart('${r.store}','${item.value}',${r.price})">
+            Add
+          </button>
+        </td>
+      </tr>`;
+  });
+  html += "</table>";
+  document.getElementById("results").innerHTML = html;
+}
 
   let html = "<table><tr><th>Store</th><th>Price</th><th>ETA</th><th></th></tr>";
 
